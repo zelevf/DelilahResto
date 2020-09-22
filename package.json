@@ -1,0 +1,19 @@
+{
+  "name": "delilahresto",
+  "version": "1.0.0",
+  "description": "Proyecto Delilah Resto - Acamica",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zelevf/DelilahResto.git"
+  },
+  "author": "Fernando Vélez",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zelevf/DelilahResto/issues"
+  },
+  "homepage": "https://github.com/zelevf/DelilahResto#readme"
+}
