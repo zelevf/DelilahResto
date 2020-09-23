@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/zelevf/DelilahResto/issues"
   },
-  "homepage": "https://github.com/zelevf/DelilahResto#readme"
+  "homepage": "https://github.com/zelevf/DelilahResto#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
 }
