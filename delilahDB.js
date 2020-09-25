@@ -1,11 +1,13 @@
 // BASE DE DATOS 
 const Sequelize = require('sequelize');
 const sequelize = new Sequelize('mysql://root:@localhost:3306/Delilah');
-
+const express = require('express');
+const bodyParser = require('body-parser');
+const server = express();
 
 
 // ----------------------------- USUARIOS -----------------------------------
-sequelize.query('select * From clientes', 
+sequelize.query('select * From cliente', 
     {type: sequelize.QueryTypes.SELECT}
 ).then(function(resultados) {
     console.log(resultados)
@@ -13,7 +15,7 @@ sequelize.query('select * From clientes',
 
 
 // Creando una cuenta y agregando un cliente (creo que le faltaria el middleware)
-server.post('/clientes', (req, res) => {
+server.post('/cliente', (req, res) => {
     console.log(req.body);
     const {usuario, nombre, apellido, email, telefono, direccion, contraseña} = req.body;
     sequelize.query('isert into clientes (usuario, nombre, apellido, email, telefono, direccion, contraseña) values (?,?,?,?,?,?,?)',   
@@ -54,3 +56,7 @@ server.post('/login', (req, res) => {
 
 
 // ----------------------------- ESTADOS DE ÓRDENES -----------------------------------
+
+
+
+server.listen(8080, () => console.log('Servidor iniciado, puerto 8080.'));
