@@ -2,32 +2,105 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const server = express();
 
-server.use(bodyParser.json);
+// server.use(bodyParser.json);
 
+// ----------------------------- USUARIOS -----------------------------------
 
+let users;
 
+// Obtener el listado clientes
+server.get('/usuarios', (req, res) => {
 
-
-
-
-
-
-
+    if (users == true) {
+        res.json(users);
+        console.log(users);
+    } else {
+        res.json("No hay usuarios registrados");
+        console.log("No hay usuarios registrados");
+    }
+});
 
 // Crear un usuario - Ruta /usuarios
 server.post('/usuarios', (req, res) => {
     let newUser = req.body;
     users.push(newUser);
-    console.log('Se agregó un nuevo autor: ' + JSON.stringify(newUser));
+    console.log('Se agregó un nuevo cliente: ' + JSON.stringify(newUser));
     res.status(201).send(req.body);
 })
-
-
-
 
 server.post('/login', (req, res) => {
     // email 
     const {user, password} = req.body;
 });
+
+
+
+
+// ----------------------------- PEDIDOS -----------------------------------
+
+
+
+
+
+
+
+// ----------------------------- PRODUCTOS -----------------------------------
+
+// Obtener productos
+server.get('/productos', (req, res) => {
+    sequelize.query("select * from productos",
+    {type: sequelize.QueryTypes.SELECT}
+    ).then((resultados) => {
+        res.json(resultados);
+    })
+});
+
+// Obtener productos por su nombre (ESTO FUNCIONA PERFECTO)
+server.get('/productos/:nombre', (req, res) => {
+    const nombre = req.params.nombre;
+
+    sequelize.query("select * from productos where nombre = :nombre",
+    {replacements: {nombre}, type: sequelize.QueryTypes.SELECT}
+    ).then((resultados) => {
+        res.json(resultados);
+    })
+
+});
+
+// Agregar productos como administrador y funciona perfecto (creo que le faltaria el middleware)
+server.post('/productos', (req, res) => {
+    const {nombre, descripcion, precio, stock} = req.body;
+    if(!nombre || !descripcion || !precio || !stock) {
+        res.status(404).send({err: "Faltan parámetros"});
+    } else {
+        sequelize.query("insert into productos (nombre, descripcion, precio, stock) value (?,?,?,?)", 
+        {replacements: [nombre, descripcion, precio, stock]}
+        ).then(function(result) {
+            res.status(202).send({producto: result})
+        })
+    }
+});
+
+
+
+// ----------------------------- CARRITO -----------------------------------
+
+
+// ----------------------------- ÓRDENES -----------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 server.listen(8080, () => console.log('Servidor iniciado, puerto 8080.'));
