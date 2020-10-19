@@ -5,8 +5,7 @@ const bodyParser = require('body-parser');
 server.use(bodyParser.json());
 
 const jwt = require('jsonwebtoken');
-
-// Como utilizar moment 
+ 
 const moment = require('moment');
 
 const Sequelize = require('sequelize');
@@ -60,21 +59,6 @@ function validarUsuarioAdmin(req, res, next) {
 function validarUsuarioCliente(req, res, next) {
 
     if (tipoUsuario == 0) {
-        let token = req.headers.authorization.split(" ")[1];
-        let validUser = jwt.verify(token, passwordJWT);
-
-        if (validUser) {
-            res.locals.validUser = validUser;
-            next();
-        }
-    } else {
-        res.json({ error: "Error en validar usuario" });
-    }
-}
-
-function validarAmbosUsers(req, res, next) {
-
-    if (tipoUsuario < 2) {
         let token = req.headers.authorization.split(" ")[1];
         let validUser = jwt.verify(token, passwordJWT);
 
@@ -142,7 +126,7 @@ server.post('/login', (req, res) => {
 
 // ----------------------------- USUARIOS -----------------------------------
 
-// OBTENER LISTA DE USUARIOS (FALTA REVISION FINAL)
+// OBTENER LISTA DE USUARIOS (PERFECTA, REVISADA)
 server.get('/usuarios/', validarUsuarioAdmin, (req, res) => {
 
     sequelize.query('select * From cliente where tipoUsuario = 0',
@@ -150,14 +134,15 @@ server.get('/usuarios/', validarUsuarioAdmin, (req, res) => {
     ).then(function (resultados) {
         console.log(resultados)
         console.log(Object.keys(resultados).length === 0)
+        console.log(Object.keys(resultados))
 
-        // if (!resultados) {
-        //     res.status(404);
-        //     res.json({ Error: "No hay usuarios registrados" });
-        // } else {
-        //     res.status(200);
-        //     res.json(resultados)
-        // }
+        if (Object.keys(resultados).length < 1) {
+            res.status(404);
+            res.json({ Error: "No hay usuarios registrados" });
+        } else {
+            res.status(200);
+            res.json(resultados)
+        }
     });
 
 });
@@ -270,29 +255,29 @@ server.put('/usuarios/:id', validarUsuarioCliente, (req, res) => {
     }
 
 });
+ 
 
-
-
-// BORRAR USUARIOS - ADMINISTRADOR (FALTA REVISION FINAL)
-server.delete('/usuarios/', validarUsuarioAdmin, (req, res) => {
-    let idRecibido = req.body.id;
-
-    sequelize.query('DELETE from cliente where id = :id',
-        { replacements: { id: `${idRecibido}` } }
-    ).then(function (resultados) {
-        res.json(resultados)
-    });
-});
-
-// BORRAR USUARIO - CLIENTE (FALTA REVISION FINAL)
+// BORRAR USUARIO - CLIENTE (PERFECTA, REVISADA)
 server.delete('/usuarios/:id', validarUsuarioCliente, (req, res) => {
     let idRecibido = req.params.id;
 
-    sequelize.query('DELETE from cliente where id = :id',
-        { replacements: { id: `${idRecibido}` } }
+    sequelize.query(`select id From Cliente where Usuario = :Usuario`,
+        { replacements: { Usuario: `${res.locals.validUser}` } }
     ).then(function (resultados) {
-        res.json(resultados)
-    });
+        let Cliente_idRecibido = resultados[0];
+        let Cliente_id = Cliente_idRecibido[0].id;
+
+        if (Cliente_id != idRecibido) {
+            res.status(400)
+            res.json({ Error: "No tienes permisos" })
+        } else {
+            sequelize.query('DELETE from cliente where id = :id',
+                { replacements: { id: `${idRecibido}` } }
+            ).then(function (resultados) {
+                res.json(resultados)
+            });
+        }
+    })
 });
 
 
@@ -302,10 +287,10 @@ server.delete('/usuarios/:id', validarUsuarioCliente, (req, res) => {
 // OBTENER LISTA DE PRODUCTOS SIN VALIDACION (PERFECTA, REVISADA)
 server.get('/productos/', (req, res) => {
     if (sequelize) {
-        res.status(200);
         sequelize.query('select * From Productos',
             { type: sequelize.QueryTypes.SELECT }
         ).then(function (resultados) {
+            res.status(200);
             res.json(resultados)
         });
     } else {
@@ -314,7 +299,7 @@ server.get('/productos/', (req, res) => {
     }
 });
 
-// AGREGAR PRODUCTOS - ADMINISTRADOR (FALTA REVISION FINAL)
+// AGREGAR PRODUCTOS - ADMINISTRADOR (PERFECTA, REVISADA)
 server.post('/productos/', validarUsuarioAdmin, (req, res) => {
     const { nombre, descripcion, precio, stock } = req.body;
     sequelize.query("INSERT INTO productos (nombre, descripcion, precio, stock) VALUES (?, ?, ?, ?)",
@@ -325,14 +310,16 @@ server.post('/productos/', validarUsuarioAdmin, (req, res) => {
     });
 });
 
-// BORRAR PRODUCTOS - ADMINISTRADOR (FALTA REVISION FINAL)
+// BORRAR PRODUCTOS - ADMINISTRADOR (PERFECTA, REVISADA)
 server.delete('/productos/', validarUsuarioAdmin, (req, res) => {
     let idRecibido = req.body.id;
 
     sequelize.query('DELETE from productos where idProductos = :id',
         { replacements: { id: `${idRecibido}` } }
     ).then(function (resultados) {
-        res.json(resultados)
+        console.log(resultados)
+        res.status(200)
+        res.json("Producto eliminado")
     });
 });
 
@@ -358,7 +345,7 @@ server.get('/productos/:id', (req, res) => {
 });
 
 
-// ACTUALIZAR PRODUCTOS - ADMINISTRADOR (FALTA REVISION FINAL)
+// ACTUALIZAR PRODUCTOS - ADMINISTRADOR (PERFECTA, REVISADA)
 server.put('/productos/:id', validarUsuarioAdmin, (req, res) => {
     let idRecibido = req.params.id;
     let nombreRecibido = req.body.nombre;
@@ -403,25 +390,27 @@ server.put('/productos/:id', validarUsuarioAdmin, (req, res) => {
     }
 });
 
-// BORRAR PRODUCTOS - ADMINISTRADOR (FALTA REVISION FINAL)
+// BORRAR PRODUCTOS - ADMINISTRADOR (PERFECTA, REVISADA)
 server.delete('/productos/:id', validarUsuarioAdmin, (req, res) => {
     let idRecibido = req.params.id;
 
     sequelize.query('DELETE from productos where idProductos = :id',
         { replacements: { id: `${idRecibido}` } }
-    ).then(function (resultados) {
-        res.json(resultados)
+    ).then(function () {
+        res.status(200)
+        res.json("Producto eliminado del stock exitosamente")
     });
 });
 
 
 
 
-// ----------------------------- ÓRDENES -----------------------------------
+// ----------------------------- ÓRDENES - ADMINISTRADOR-----------------------------------
 
-//////////////////////////// RUTA ÓRDENES (FALTA REVISION FINAL)
+//////////////////////////// RUTA ÓRDENES
+// // (PERFECTA, REVISADA)
 server.get('/ordenes/', validarUsuarioAdmin, (req, res) => {
-    sequelize.query('SELECT * FROM Pedidos JOIN Cliente ON Pedidos.Cliente_id = Cliente.id JOIN Pedidos_Productos ON Pedidos.id = Pedidos_Productos.Pedidos_id',
+    sequelize.query('SELECT *, Pedidos_Productos.* FROM Pedidos JOIN Pedidos_Productos ON Pedidos_Productos.Cliente_id = Pedidos.Cliente_id',
         { type: sequelize.QueryTypes.SELECT }
     ).then(function (resultados) {
         if (resultados < 1) {
@@ -433,17 +422,19 @@ server.get('/ordenes/', validarUsuarioAdmin, (req, res) => {
         }
     });
 });
+ 
 
 
-// (FALTA REVISION FINAL)
+// (PERFECTA, REVISADA)
 server.put('/ordenes/', validarUsuarioAdmin, (req, res) => {
     let idRecibido = req.body.id;
     let estadoRecibido = req.body.estado;
 
     sequelize.query('select Estados_id From Pedidos',
     ).then(function (resultados) {
-        let nuevo = resultados[0].Estados_id;
-        if (!nuevo < 5) {
+        let nuevo = resultados[0];
+        console.log(nuevo[0].Estados_id)
+        if (nuevo[0].Estados_id < 5) {
             sequelize.query(`UPDATE Pedidos set Estados_id = ${estadoRecibido} where id = ${idRecibido}`,
             ).then(function () {
                 res.status(200)
@@ -454,38 +445,28 @@ server.put('/ordenes/', validarUsuarioAdmin, (req, res) => {
             res.json({ error: "No puedes realizar cambios a la orden" })
         }
     });
-});
+}); 
 
-// (FALTA REVISION FINAL)
-server.delete('/ordenes/', validarUsuarioAdmin, (req, res) => {
-    let idRecibido = req.body.id;
 
-    sequelize.query('DELETE from pedidos where id = :id',
+//////////////////////////// RUTA ÓRDENES:ID (PERFECTA, REVISADA)
+server.get('/ordenes/:id', validarUsuarioAdmin, (req, res) => {
+    let idRecibido = req.params.id;
+    sequelize.query('select * From Pedidos where id = :id',
         { replacements: { id: `${idRecibido}` } }
     ).then(function (resultados) {
-        if (sequelize > 0) {
+        console.log(resultados[0])
+        let orden = resultados[0];
+        console.log(orden[0].id)
+        if (orden[0].id > 0) {
+            res.status(200);
             res.json(resultados)
+    
         } else {
             res.status(404);
             res.json({ Error: "La orden no existe" });
         }
     });
-});
 
-//////////////////////////// RUTA ÓRDENES:ID (FALTA REVISION FINAL)
-server.get('/ordenes/:id', validarUsuarioAdmin, (req, res) => {
-    let idRecibido = req.params.id;
-    if (sequelize > 0) {
-        res.status(200);
-        sequelize.query('select * From Pedidos where id = :id',
-            { replacements: { id: `${idRecibido}` } }
-        ).then(function (resultados) {
-            res.json(resultados)
-        });
-    } else {
-        res.status(404);
-        res.json({ Error: "La orden no existe" });
-    }
 });
 
 
@@ -510,91 +491,177 @@ server.get('/ordenes/:id', validarUsuarioAdmin, (req, res) => {
 
 
 
-// ----------------------------- PEDIDOS -----------------------------------
+// ----------------------------- PEDIDOS - CLIENTE -----------------------------------
 
 //////////////////////////// RUTA PEDIDOS
-// server.get('/pedidos/', validarUsuarioCliente, (req, res) => {
-//     sequelize.query('SELECT * FROM Pedidos JOIN Pedidos_Productos ON Pedidos.id = Pedidos_Productos.Pedidos_id',
-//         { type: sequelize.QueryTypes.SELECT }
+// (PERFECTA, REVISADA)
+server.get('/pedidos/', validarUsuarioCliente, (req, res) => {
+
+    sequelize.query(`select id From Cliente where Usuario = :Usuario`,
+        { replacements: { Usuario: `${res.locals.validUser}` } }
+    ).then(function (resultados) {
+        let Cliente_idRecibido = resultados[0];
+        console.log("Aqui me dice el ID");
+        console.log(Cliente_idRecibido[0].id);
+        if (Cliente_idRecibido[0].id < 1) {
+            res.status(500)
+            res.json("Error interno, intenta más tarde");
+        } else {
+            sequelize.query(`SELECT * FROM Pedidos where Cliente_id = ${Cliente_idRecibido[0].id}`
+            ).then(function (resultados) {
+                console.log(Object.keys(resultados[0].length))
+                console.log("LEER JUSTO AQUI ARRIBA")
+                // res.json(resultados[0])
+                if (Object.keys(resultados[0]).length === 0) {
+                    console.log("LEER JUSTO AQUI ARRIBA")
+                    res.status(404);
+                    res.json({ error: "No hay pedidos registrados" })
+                } else {
+                    res.status(200);
+                    res.json(resultados[0])
+                }
+            });
+        }
+    }); 
+});
+
+// // HACER PEDIDOS SIN VALIDACION (NO FUNCIONA)
+// server.post('/pedidos/', validarUsuarioCliente, (req, res) => {
+//     let FechaRecibido = moment();
+//     let FormaDePagoRecibido = req.body.FormaDePago;
+
+//     // PARA ESTE HACER UN CICLO
+//     let PrecioTotalRecibido = req.body.PrecioTotal;
+//     let CompraRecibido = req.body.Compra;
+
+//     sequelize.query(`select id From Cliente where Usuario = :Usuario`,
+//         { replacements: { Usuario: `${res.locals.validUser}` } }
 //     ).then(function (resultados) {
-//         if (resultados) {
-//             res.status(200);
-//             res.json(resultados)
+//         let Cliente_idRecibido = resultados[0];
+//         console.log("REVISAR JUSTO AQUI ABAJO")
+//         console.log(Cliente_idRecibido[0].id);
+//         if (Cliente_idRecibido[0].id < 1) {
+//             res.status(500)
+//             res.json("Error interno, intenta más tarde");
 //         } else {
-//             res.status(404);
-//             res.json({ Error: "No hay pedidos registrados" });
+//             sequelize.query(`select id From Pedidos where Cliente_id = ${Cliente_idRecibido[0].id}`
+//             ).then(function (resultados) {
+//                 console.log(resultados[0])
+//                 // res.json(resultados);
+//                 console.log("MIRA ARRIBA")
+
+//                 if (Object.keys(resultados[0].length === 0)) {
+//                     console.log("Felicidades es tu primera compra");
+
+//                     sequelize.query("INSERT INTO Pedidos (Fecha, PrecioTotal, Estados_id, FormaDePago, Cliente_id) VALUES (?, ?, ?, ?, ?)",
+//                         { replacements: [`${FechaRecibido}`, PrecioTotalRecibido, 1, FormaDePagoRecibido, Cliente_idRecibido[0].id] }
+//                     ).then((resultados) => {
+//                         console.log(resultados)
+//                         res.json(resultados)
+
+//                         let number = resultados;
+//                         sequelize.query(`Update Pedidos_Productos set Compra = ${number[0]} where Compra = 0`,
+//                         ).then((resultados) => {
+//                             res.json({ "resultados": "Tu compra fue realizada exitosamente" })
+//                         });
+
+//                     });
+//                 } else {
+//                     console.log("Nos alegra que compraras otra vez");
+//                 }
+//             })
 //         }
 //     });
 // });
 
-server.get('/pedidos/', (req, res) => {
-    let idRecibido = req.body.id;
-    sequelize.query('SELECT * FROM Pedidos JOIN Pedidos_Productos ON Pedidos.id = Pedidos_Productos.Pedidos_id where Cliente_id = :id',
-        { replacements: { id: `${idRecibido}` } }
+server.post('/pedidos/', validarUsuarioCliente, (req, res) => {
+    let FechaRecibido = moment();
+    let FormaDePagoRecibido = req.body.FormaDePago;
+
+    // PARA ESTE HACER UN CICLO
+    let PrecioTotalRecibido = req.body.PrecioTotal;
+    let CompraRecibido = JSON.stringify(FechaRecibido);
+    console.log(CompraRecibido)
+    console.log("AQUI 0")
+
+    sequelize.query(`select id From Cliente where Usuario = :Usuario`,
+        { replacements: { Usuario: `${res.locals.validUser}` } }
     ).then(function (resultados) {
-        // console.log(res.locals.validUser)
-        // console.log(res.locals)
-        console.log(resultados)
-        if (res.locals.validUser != resultados[0].Usuario) {
-            res.status(400);
-            res.json({ error: "No tienes permisos" })
+        let Cliente_idRecibido = resultados[0];
+        console.log("AQUI 1")
+        console.log(Cliente_idRecibido[0].id);
+        if (Cliente_idRecibido[0].id < 1) {
+            res.status(500)
+            res.json("Error interno, intenta más tarde");
         } else {
-            if (resultados) {
-                res.status(200);
-                res.json(resultados)
-            } else {
-                res.status(404);
-                res.json({ Error: "No hay pedidos registrados" });
-            }
+            sequelize.query(`select id From Pedidos where Cliente_id = ${Cliente_idRecibido[0].id}`
+            ).then(function (resultados) {
+                console.log(resultados[0])
+                // res.json(resultados);
+                console.log("AQUI 2")
+
+                if (Object.keys(resultados[0].length === 0)) {
+                    console.log("Felicidades es tu primera compra");
+                    console.log("AQUI 3")
+                    sequelize.query("INSERT INTO Pedidos (Fecha, PrecioTotal, Estados_id, FormaDePago, Cliente_id) VALUES (?, ?, ?, ?, ?)",
+                        { replacements: [`${FechaRecibido}`, PrecioTotalRecibido, 1, FormaDePagoRecibido, Cliente_idRecibido[0].id] }
+                    ).then((resultados) => {
+                        console.log(resultados)
+                        res.json(resultados)
+                        console.log("AQUI 4")
+                        let number = resultados;
+                        sequelize.query(`Update Pedidos_Productos set Compra = ${CompraRecibido} where Compra = 0`,
+                        ).then((resultados) => {
+                            res.json({ "resultados": "Tu compra fue realizada exitosamente" })
+                        });
+
+                    });
+                } else {
+                    console.log("AQUI 5")
+                    console.log("Nos alegra que compraras otra vez");
+                }
+            })
         }
     });
 });
 
-// HACER PEDIDOS SIN VALIDACION (NO FUNCIONA)
-server.post('/pedidos/', validarUsuarioCliente, (req, res) => {
-    let FechaRecibido = req.body.Fecha;
-    let PrecioTotalRecibido = req.body.PrecioTotal;
-    let FormaDePagoRecibido = req.body.FormaDePago;
-    let Cliente_idRecibido = req.body.Cliente_id;
 
 
-    sequelize.query('select * From Pedidos_Productos where Pedidos_id < 1',
-    ).then(function (resultados) {
-        if (resultados < 1) {
-            res.status(404);
-            res.json({ error: "No hay productos en carrito" })
-        } else {
-            sequelize.query("INSERT INTO Pedidos (Fecha, PrecioTotal, Estados_id, FormaDePago, Cliente_id) VALUES (?, ?, ?, ?, ?)",
-                { replacements: [FechaRecibido, PrecioTotalRecibido, 1, FormaDePagoRecibido, Cliente_idRecibido] }
-            ).then((resultados) => {
-                let number = resultados;
-                sequelize.query(`Update Pedidos_Productos set Pedidos_id = ${number[0]} where Pedidos_id is NULL`,
-                ).then((resultados) => {
-                    res.json({ "resultados": "Tu compra fue realizada exitosamente" })
-                });
 
 
-            });
-        };
-    });
-});
 
 
-//////////////////////////// RUTA PEDIDOS:ID
+
+//////////////////////////// RUTA PEDIDOS:ID (PERFECTA, REVISADA)
 server.get('/pedidos/:id', validarUsuarioCliente, (req, res) => {
     let idRecibido = req.params.id;
 
-    sequelize.query('select * From Pedidos where Cliente_id = :id',
-        { replacements: { id: `${idRecibido}` } }
+
+    sequelize.query(`select id From Cliente where Usuario = :Usuario`,
+        { replacements: { Usuario: `${res.locals.validUser}` } }
     ).then(function (resultados) {
-        if (!resultados) {
-            res.status(404);
-            res.json({ error: "Todavía no has realizado ninguna compra" })
+        let Cliente_idRecibido = resultados[0];
+        console.log(Cliente_idRecibido[0].id);
+        if (Cliente_idRecibido[0].id < 1) {
+            res.status(500)
+            res.json("Error interno, intenta más tarde");
         } else {
-            res.status(200);
-            res.json(resultados);
+            sequelize.query(`select * From Pedidos where Cliente_id = ${Cliente_idRecibido[0].id} and id = ${idRecibido}`
+            ).then(function (resultados) {
+                console.log(resultados[0])
+                let pedid = resultados[0];
+                console.log(pedid[0])
+        
+                if (Object.keys(pedid).length === 0) {
+                    res.status(404);
+                    res.json({ error: "La compra no está disponible" })
+                } else {
+                    res.status(200);
+                    res.json(resultados);
+                }
+            });
         }
-    });
+    }); 
 });
 
 
@@ -604,6 +671,7 @@ server.get('/pedidos/:id', validarUsuarioCliente, (req, res) => {
 
 // ----------------------------- CARRITO -----------------------------------
 
+// Math.max() AGREGAR ESTA FUNCION AL CARRITO
 // REVISAR EL CARRITO - CLIENTE (PERFECTA, REVISADA)
 server.get('/carrito/', validarUsuarioCliente, (req, res) => {
 
@@ -616,6 +684,7 @@ server.get('/carrito/', validarUsuarioCliente, (req, res) => {
             res.status(500)
             res.json("Error interno, intenta más tarde");
         } else {
+            console.log("LEER JUSTO AQUI")
             sequelize.query(`SELECT * from Pedidos_Productos where Cliente_id = ${Cliente_idRecibido[0].id}`,
                 { type: sequelize.QueryTypes.SELECT }
             ).then(function (resultados) {
@@ -635,7 +704,7 @@ server.get('/carrito/', validarUsuarioCliente, (req, res) => {
 });
 
 
-
+ 
 // AGREGAR PRODUCTOS AL CARRITO - CLIENTE (PERFECTA, REVISADA)
 
 server.post('/carrito/', validarUsuarioCliente, (req, res) => {
@@ -654,31 +723,32 @@ server.post('/carrito/', validarUsuarioCliente, (req, res) => {
             let Cliente_idRecibido = resultados[0];
             let Cliente_id = Cliente_idRecibido[0].id;
 
-            sequelize.query(`select Productos_idProductos From Pedidos_Productos where Cliente_id = :Cliente_id and Productos_idProductos = ${Productos_idProductosRecibido}`,
+            sequelize.query(`select Productos_idProductos From Pedidos_Productos where Cliente_id = :Cliente_id  and Compra = 0 and Productos_idProductos = ${Productos_idProductosRecibido}`,
                 { replacements: { Cliente_id: `${Cliente_id}` } }
             ).then(function (resultados) {
                 console.log("Leer aqui abajo")
-                console.log(resultados)
-                let Produ = resultados[0];
-                console.log("Leer SEGUNDO aqui abajo")
-                console.log(Object.keys(Produ).length === 0)
+                console.log(typeof resultados)
+                console.log(Object.values(resultados[0]) == 0)
+                console.log(Object.entries(resultados).length == 0) 
 
-                if (Object.keys(Produ).length === 0) {
-                    sequelize.query(`INSERT INTO Pedidos_Productos (CantidadProduct, Precio,  Productos_idProductos, Cliente_id) VALUES (?, ?, ?, ${Cliente_id})`,
+                if (Object.values(resultados[0]) == 0) {
+                    sequelize.query(`INSERT INTO Pedidos_Productos (CantidadProduct, Precio,  Productos_idProductos, Cliente_id, Compra) VALUES (?, ?, ?, ${Cliente_id}, 0)`,
                         { replacements: [CantidadProductRecibido, PrecioRecibido[0].Precio, Productos_idProductosRecibido] }
                     ).then((resultados) => {
                         console.log(`Producto agregado con éxito ${resultados}`)
                         res.json('Agregado con éxito');
                     });
+
+
                 } else {
                     res.status(400)
                     res.json({ error: "Ya este producto fue agregado al carrito" })
                 }
+
             });
         });
     })
 });
-
 
 
 
@@ -745,11 +815,12 @@ server.delete('/carrito/:id', validarUsuarioCliente, (req, res) => {
             res.status(500)
             res.json("Error interno, intenta más tarde");
         } else {
-            sequelize.query(`select Productos_idProductos from Pedidos_Productos where Cliente_id = ${Cliente_idRecibido[0].id} and ${Productos_idProductosRecibido}`
+            sequelize.query(`select Productos_idProductos from Pedidos_Productos where Cliente_id = ${Cliente_idRecibido[0].id} and Productos_idProductos = ${Productos_idProductosRecibido}`
             ).then(function (resultados) {
                 let pr = resultados[0];
+                console.log(pr)
                 console.log("LEE ESTE")
-                console.log(pr[0], Productos_idProductosRecibido)
+                console.log(pr[0].Productos_idProductos, Productos_idProductosRecibido)
                 if(pr[0].Productos_idProductos != Productos_idProductosRecibido){
                     res.status(404)
                     res.json("El producto no está disponible");
@@ -892,3 +963,22 @@ server.listen(8080, () => console.log('Servidor iniciado, puerto 8080.'));
 //         // LO QUE QUIERA HACER 
 //     }
 // }); 
+
+
+
+
+// ESTA REESTRICCION ME ESTA EVITANDO BORRAR EL USUARIO 
+// Cannot delete or update a parent row: a foreign key constraint fails (`delilahfv`.`favoritos`, CONSTRAINT `fk_Favoritos_Cliente1` FOREIGN KEY (`Cliente_id`) REFERENCES `Cliente` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION)
+
+// Agregar Estados.id a la tabla Pedidos_Productos 
+
+
+// PARA VER QUE PRODUCTOS TENGO EN EL CARRITO 
+// TENGO QUE MOSTRAR TODOS LOS PEDIDOS PRODUCTOS DEL CLIENTE QUE EL ID DE PEDIDOS PRODUCTOS NO ESTE EN LA TABLA DE PEDIDOS 
+
+
+
+// TENGO QUE HACER Un NUMERO DE COMPRA, ESTE ESTARA EN LA TABLA DE PEDIDOS, Y TAMBIEN ESTARA EN LA TABLA PRODUCTO PEDIDOS (PERO AQUI TODOS LOS PRODUCTOS AL MOMENTO DE COMPRAR RECIBEN EL MISMO)
+
+
+// SOLO ME FALTA RESOLVER 582
