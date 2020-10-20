@@ -74,8 +74,8 @@ server.post('/registro/', (req, res) => {
             sequelize.query("INSERT INTO cliente (usuario, password, nombre, email, telefono, direccion, tipoUsuario) VALUES (?, ?, ?, ?, ?, ?, ?)",
                 { replacements: [usuario, password, nombre, email, telefono, direccion, 0] }
             ).then(() => {
-                res.status(200)
-                res.json({ resultados: "Usuario agregado exitosamente" });
+                res.status(201)
+                res.json({ resultados: "Usuario creado exitosamente" });
             });
         } else {
             res.status(400)
@@ -104,6 +104,7 @@ server.post('/login', (req, res) => {
             tipoUsuario = result[0].tipoUsuario;
             res.locals.tipoUsuario = tipoUsuario;
             let token = jwt.sign(usuarioRecibido, passwordRecibido);
+            res.status(200);
             res.json({ token });
         }
     });
@@ -147,7 +148,7 @@ server.get('/usuarios/:id', validarUsuarioCliente, (req, res) => {
                 res.json({ error: "La información no está disponible" })
             } else {
                 if (res.locals.validUser != result[0].Usuario) {
-                    res.status(400);
+                    res.status(401);
                     res.json({ error: "No tienes permisos" })
                 } else {
                     res.status(200).send({
@@ -252,13 +253,14 @@ server.delete('/usuarios/:id', validarUsuarioCliente, (req, res) => {
         let Cliente_id = Cliente_idRecibido[0].id;
 
         if (Cliente_id != idRecibido) {
-            res.status(400)
+            res.status(401)
             res.json({ Error: "No tienes permisos" })
         } else {
             sequelize.query('DELETE from cliente where id = :id',
                 { replacements: { id: `${idRecibido}` } }
             ).then(function (resultados) {
-                res.json(resultados)
+                res.status(200)
+                res.json("Usuario eliminado exitosamente")
             });
         }
     })
@@ -289,7 +291,8 @@ server.post('/productos/', validarUsuarioAdmin, (req, res) => {
     sequelize.query("INSERT INTO productos (nombre, descripcion, precio, stock) VALUES (?, ?, ?, ?)",
         { replacements: [nombre, descripcion, precio, stock] }
     ).then((resultados) => {
-        res.json('Agregado con éxito');
+        res.status(201)
+        res.json('Producto agregado con éxito');
     });
 });
 
@@ -316,7 +319,7 @@ server.get('/productos/:id', (req, res) => {
         { replacements: { id: idProductos }, type: sequelize.QueryTypes.SELECT }
     ).then(function (result) {
         if (result < 1) {
-            res.status(400);
+            res.status(404);
             res.json({ error: "El producto no existe" })
         } else {
             res.status(200).send({
@@ -419,7 +422,7 @@ server.put('/ordenes/', validarUsuarioAdmin, (req, res) => {
                 res.json("Has modificado el estado de la orden.")
             });
         } else {
-            res.status(400);
+            res.status(401);
             res.json({ error: "No puedes realizar cambios a la orden" })
         }
     });
@@ -519,6 +522,7 @@ server.post('/pedidos/', validarUsuarioCliente, (req, res) => {
                             });
                         });
                     } else {
+                        res.status(404);
                         res.json("No tienes items agregados al carrito")
                     }
                 })
@@ -573,7 +577,7 @@ server.get('/carrito/', validarUsuarioCliente, (req, res) => {
             res.status(500)
             res.json("Error interno, intenta más tarde");
         } else {
-            sequelize.query(`SELECT * from Pedidos_Productos where Cliente_id = ${Cliente_idRecibido[0].id}`,
+            sequelize.query(`SELECT * from Pedidos_Productos where Cliente_id = ${Cliente_idRecibido[0].id} and Compra = 0`,
                 { type: sequelize.QueryTypes.SELECT }
             ).then(function (resultados) {
                 if (resultados < 1) {
@@ -614,6 +618,7 @@ server.post('/carrito/', validarUsuarioCliente, (req, res) => {
                     sequelize.query(`INSERT INTO Pedidos_Productos (CantidadProduct, Precio,  Productos_idProductos, Cliente_id, Compra) VALUES (?, ?, ?, ${Cliente_id}, 0)`,
                         { replacements: [CantidadProductRecibido, PrecioRecibido[0].Precio, Productos_idProductosRecibido] }
                     ).then((resultados) => {
+                        res.status(200)
                         res.json('Agregado con éxito');
                     });
                 } else {
@@ -663,6 +668,7 @@ server.delete('/carrito/', validarUsuarioCliente, (req, res) => {
         } else {
             sequelize.query(`DELETE from Pedidos_Productos where Cliente_id = ${Cliente_idRecibido[0].id}`
             ).then(function (resultados) {
+                res.status(200)
                 res.json(resultados)
             });
         }
@@ -744,6 +750,7 @@ server.post('/favoritos/', validarUsuarioCliente, (req, res) => {
                 sequelize.query(`INSERT INTO Favoritos (Productos_idProductos, Cliente_id) VALUES (?, ${Cliente_idRecibido[0].id})`,
                     { replacements: [PRecibido[0]] }
                 ).then((resultados) => {
+                    res.status(200)
                     res.json('Agregado a favoritos con éxito');
                 });
             } else {
@@ -772,6 +779,7 @@ server.delete('/favoritos/', validarUsuarioCliente, (req, res) => {
             } else {
                 sequelize.query(`DELETE from Favoritos where Productos_idProductos = ${Productos_idProductosRecibido} and Cliente_id = ${Cliente_idRecibido[0].id}`
                 ).then(function (resultados) {
+                    res.status(200)
                     res.json('Eliminado de tus favoritos con éxito');
                 });
             }
