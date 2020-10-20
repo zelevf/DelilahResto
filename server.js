@@ -525,20 +525,24 @@ server.get('/pedidos/', validarUsuarioCliente, (req, res) => {
     }); 
 });
 
-// // HACER PEDIDOS SIN VALIDACION (NO FUNCIONA)
+
+
+
+// // // HACER PEDIDOS SIN VALIDACION (NO FUNCIONA)
 // server.post('/pedidos/', validarUsuarioCliente, (req, res) => {
 //     let FechaRecibido = moment();
 //     let FormaDePagoRecibido = req.body.FormaDePago;
-
-//     // PARA ESTE HACER UN CICLO
 //     let PrecioTotalRecibido = req.body.PrecioTotal;
-//     let CompraRecibido = req.body.Compra;
+
+//     let CompraRecibido = JSON.stringify(FechaRecibido);
+//     console.log(CompraRecibido)
+//     console.log("AQUI 0")
 
 //     sequelize.query(`select id From Cliente where Usuario = :Usuario`,
 //         { replacements: { Usuario: `${res.locals.validUser}` } }
 //     ).then(function (resultados) {
 //         let Cliente_idRecibido = resultados[0];
-//         console.log("REVISAR JUSTO AQUI ABAJO")
+//         console.log("AQUI 1")
 //         console.log(Cliente_idRecibido[0].id);
 //         if (Cliente_idRecibido[0].id < 1) {
 //             res.status(500)
@@ -548,25 +552,26 @@ server.get('/pedidos/', validarUsuarioCliente, (req, res) => {
 //             ).then(function (resultados) {
 //                 console.log(resultados[0])
 //                 // res.json(resultados);
-//                 console.log("MIRA ARRIBA")
+//                 console.log("AQUI 2")
 
 //                 if (Object.keys(resultados[0].length === 0)) {
 //                     console.log("Felicidades es tu primera compra");
-
+//                     console.log("AQUI 3")
 //                     sequelize.query("INSERT INTO Pedidos (Fecha, PrecioTotal, Estados_id, FormaDePago, Cliente_id) VALUES (?, ?, ?, ?, ?)",
 //                         { replacements: [`${FechaRecibido}`, PrecioTotalRecibido, 1, FormaDePagoRecibido, Cliente_idRecibido[0].id] }
 //                     ).then((resultados) => {
 //                         console.log(resultados)
 //                         res.json(resultados)
-
-//                         let number = resultados;
-//                         sequelize.query(`Update Pedidos_Productos set Compra = ${number[0]} where Compra = 0`,
+//                         console.log("AQUI 4")
+//                         // let number = resultados;
+//                         sequelize.query(`Update Pedidos_Productos set Compra = ${CompraRecibido} where Compra = 0`,
 //                         ).then((resultados) => {
 //                             res.json({ "resultados": "Tu compra fue realizada exitosamente" })
 //                         });
 
 //                     });
 //                 } else {
+//                     console.log("AQUI 5")
 //                     console.log("Nos alegra que compraras otra vez");
 //                 }
 //             })
@@ -574,48 +579,256 @@ server.get('/pedidos/', validarUsuarioCliente, (req, res) => {
 //     });
 // });
 
+
+
+
+// ESTA DEBERIA FUNCIONAR 
+
+// server.post('/pedidos/', validarUsuarioCliente, (req, res) => {
+//     let FechaRecibido = moment();
+
+//     let FormaDePagoRecibido = req.body.FormaDePago;
+//     let CompraRecibido = JSON.stringify(FechaRecibido);
+//     let PrecioTotalRecibido = PrecioTotal();
+
+
+//     function PrecioTotal() {
+//         sequelize.query(`select CantidadProduct * Precio From Pedidos_Productos where Compra = 0`
+//         ).then(function (resultados) {
+//             let item = Array.from(resultados[0]);
+    
+//             let i = 0;
+//             let suma = 0;
+//             let num;
+    
+//             while (i <= item.length) {
+//                 num = parseInt(Object.values(item[i]));
+//                 suma = suma + parseInt(num);
+//                 console.log("Monto total a pagar " + suma)
+//                 i++
+//             }
+//             // return resultados;
+//         }) 
+//     }
+
+//     sequelize.query(`select id From Cliente where Usuario = :Usuario`,
+//         { replacements: { Usuario: `${res.locals.validUser}` } }
+//     ).then(function (resultados) {
+//         let Cliente_idRecibido = resultados[0];
+//         if (Cliente_idRecibido[0].id < 1) {
+//             res.status(500)
+//             res.json("Error interno, intenta más tarde");
+//         } else {
+//             sequelize.query(`select id From Pedidos where Cliente_id = ${Cliente_idRecibido[0].id}`
+//             ).then(function (resultados) {
+
+//                 if (Object.keys(resultados[0].length === 0)) {
+//                     // let PrecioTotalRecibido = parseInt(PrecioTotal());
+//                     console.log("Compra total + " + PrecioTotalRecibido);
+
+//                     console.log("Felicidades es tu primera compra");
+//                     sequelize.query("INSERT INTO Pedidos (Fecha, PrecioTotal, Estados_id, FormaDePago, Cliente_id) VALUES (?, ?, ?, ?, ?)",
+//                         { replacements: [`${FechaRecibido}`, PrecioTotalRecibido, 1, FormaDePagoRecibido, Cliente_idRecibido[0].id] }
+//                     ).then((resultados) => {
+
+//                         res.json(resultados)
+//                         sequelize.query(`Update Pedidos_Productos set Compra = ${CompraRecibido} where Compra = 0`,
+//                         ).then(() => {
+//                             res.json("Tu compra fue realizada exitosamente")
+//                         });
+
+//                     });
+
+//                 } else {
+//                     console.log("AQUI 5")
+//                     console.log("Nos alegra que compraras otra vez");
+//                 }
+//             })
+//         }
+//     });
+// });
+
+
+
+// server.post('/pedidos/', validarUsuarioCliente, (req, res) => {
+//     let FechaRecibido = moment();
+
+//     let FormaDePagoRecibido = req.body.FormaDePago;
+//     let CompraRecibido = JSON.stringify(FechaRecibido);
+//     // let PrecioTotalRecibido = PrecioTotal();
+
+
+//     function PrecioTotal() {
+
+//         let montoCompleto = sequelize.query(`select CantidadProduct * Precio From Pedidos_Productos where Compra = 0`
+//         ).then(function (resultados) {
+//             let item = Array.from(resultados[0]);
+
+//             let i = 0;
+//             let suma = 0;
+//             let num;
+
+//             while (i < item.length) {
+//                 num = parseInt(Object.values(item[i]));
+//                 suma = suma + parseInt(num);
+//                 console.log("Monto total a pagar " + suma)
+//                 i++
+//             }
+
+//         }).then(function (result) {
+//             return montoCompleto
+//         }).then(function(r)  {
+//             console.log("DENTRO DE LA FUNCION")
+//             console.log(r)
+//         })
+//     }
+
+//     sequelize.query(`select id From Cliente where Usuario = :Usuario`,
+//         { replacements: { Usuario: `${res.locals.validUser}` } }
+//     ).then(function (resultados) {
+//         let Cliente_idRecibido = resultados[0];
+//         if (Cliente_idRecibido[0].id < 1) {
+//             res.status(500)
+//             res.json("Error interno, intenta más tarde");
+//         } else {
+//             sequelize.query(`select id From Pedidos where Cliente_id = ${Cliente_idRecibido[0].id}`
+//             ).then(function (resultados) {
+
+//                 if (Object.keys(resultados[0].length === 0)) {
+//                     console.log("CIFRA 2 + " + PrecioTotal());
+//                     let PrecioTotalRecibido;
+//                     PrecioTotalRecibido = PrecioTotal();
+//                     console.log("Compra total + " + PrecioTotalRecibido);
+
+//                     console.log("Felicidades es tu primera compra");
+//                     sequelize.query("INSERT INTO Pedidos (Fecha, PrecioTotal, Estados_id, FormaDePago, Cliente_id) VALUES (?, ?, ?, ?, ?)",
+//                         { replacements: [`${FechaRecibido}`, PrecioTotalRecibido, 1, FormaDePagoRecibido, Cliente_idRecibido[0].id] }
+//                     ).then((resultados) => {
+
+//                         res.json(resultados)
+//                         sequelize.query(`Update Pedidos_Productos set Compra = ${CompraRecibido} where Compra = 0`,
+//                         ).then(() => {
+//                             res.json("Tu compra fue realizada exitosamente")
+//                         });
+
+//                     });
+
+//                 } else {
+//                     console.log("AQUI 5")
+//                     console.log("Nos alegra que compraras otra vez");
+//                 }
+//             })
+//         }
+//     });
+// });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 server.post('/pedidos/', validarUsuarioCliente, (req, res) => {
     let FechaRecibido = moment();
-    let FormaDePagoRecibido = req.body.FormaDePago;
 
-    // PARA ESTE HACER UN CICLO
-    let PrecioTotalRecibido = req.body.PrecioTotal;
+    let FormaDePagoRecibido = req.body.FormaDePago;
     let CompraRecibido = JSON.stringify(FechaRecibido);
-    console.log(CompraRecibido)
-    console.log("AQUI 0")
+    // let PrecioTotalRecibido = PrecioTotal();
+
+
+
+
+
+
+
+
+
+
+
+
 
     sequelize.query(`select id From Cliente where Usuario = :Usuario`,
         { replacements: { Usuario: `${res.locals.validUser}` } }
     ).then(function (resultados) {
         let Cliente_idRecibido = resultados[0];
-        console.log("AQUI 1")
-        console.log(Cliente_idRecibido[0].id);
         if (Cliente_idRecibido[0].id < 1) {
             res.status(500)
             res.json("Error interno, intenta más tarde");
         } else {
             sequelize.query(`select id From Pedidos where Cliente_id = ${Cliente_idRecibido[0].id}`
             ).then(function (resultados) {
-                console.log(resultados[0])
-                // res.json(resultados);
-                console.log("AQUI 2")
 
                 if (Object.keys(resultados[0].length === 0)) {
-                    console.log("Felicidades es tu primera compra");
-                    console.log("AQUI 3")
-                    sequelize.query("INSERT INTO Pedidos (Fecha, PrecioTotal, Estados_id, FormaDePago, Cliente_id) VALUES (?, ?, ?, ?, ?)",
-                        { replacements: [`${FechaRecibido}`, PrecioTotalRecibido, 1, FormaDePagoRecibido, Cliente_idRecibido[0].id] }
-                    ).then((resultados) => {
-                        console.log(resultados)
-                        res.json(resultados)
-                        console.log("AQUI 4")
-                        let number = resultados;
-                        sequelize.query(`Update Pedidos_Productos set Compra = ${CompraRecibido} where Compra = 0`,
-                        ).then((resultados) => {
-                            res.json({ "resultados": "Tu compra fue realizada exitosamente" })
-                        });
 
-                    });
+
+                    sequelize.query(`select CantidadProduct * Precio From Pedidos_Productos where Compra = 0`
+                    ).then( (resultados) => {
+                 
+                        let item = Array.from(resultados[0]);
+                    
+                        let i = 0;
+                        let suma = 0;
+                        let num;
+                    
+                        while (i < item.length) {
+                            num = parseInt(Object.values(item[i]));
+                            suma = suma + parseInt(num);
+                            console.log("Monto total a pagar " + suma)
+                            i++
+                        }
+ 
+                        if(suma > 0) {
+                            console.log("CIFRA 2 + " + suma);
+                            let PrecioTotalRecibido = suma;
+
+                            console.log("Compra total + " + PrecioTotalRecibido);
+        
+                            console.log("Felicidades es tu primera compra");
+                            sequelize.query("INSERT INTO Pedidos (Fecha, PrecioTotal, Estados_id, FormaDePago, Cliente_id) VALUES (?, ?, ?, ?, ?)",
+                                { replacements: [`${FechaRecibido}`, PrecioTotalRecibido, 1, FormaDePagoRecibido, Cliente_idRecibido[0].id] }
+                            ).then((resultados) => {
+        
+                                // res.json(resultados)
+                                sequelize.query(`Update Pedidos_Productos set Compra = ${CompraRecibido} where Compra = 0`,
+                                ).then((resultado) => {
+                                    // console.log(resultado);
+                                    res.status(200);
+                                    res.json("Tu compra fue realizada exitosamente")
+                                });
+        
+                            });
+                        } else {
+                            console.log("No tienes items agregados al carrito")
+                            res.json("No tienes items agregados al carrito")
+                        }
+                    })
+
+
+
+
+
+
+
+
+
+
+
+                    
+
                 } else {
                     console.log("AQUI 5")
                     console.log("Nos alegra que compraras otra vez");
@@ -624,6 +837,16 @@ server.post('/pedidos/', validarUsuarioCliente, (req, res) => {
         }
     });
 });
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -982,3 +1205,4 @@ server.listen(8080, () => console.log('Servidor iniciado, puerto 8080.'));
 
 
 // SOLO ME FALTA RESOLVER 582
+// AGREGAR QUE SI EL PRECIO TOTAL NO ES MAYOR DE 0, NO PUEDA COMPRAR 
