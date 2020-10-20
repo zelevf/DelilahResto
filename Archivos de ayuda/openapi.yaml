@@ -1,0 +1,822 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: Delilah Restó
+  description: API Proyecto Delilah Restó - Acámica
+  contact:
+    name: Fernando Vélez
+servers:
+  - url: https://localhost:8080
+    description: Servidor
+      
+paths:
+  /registro:
+    post:
+      tags:
+        - Cliente
+        - Administrador
+      summary: Registrarse a la App de Delilah Restó
+      description: Registro de usuarios
+      parameters: 
+        - in: query
+          name: usuario
+          required: true
+          schema:
+            type: string
+            format: varchar(20)
+        - in: query
+          name: password
+          required: true
+          schema:
+            type: string
+            format: varchar(100)
+        - in: query
+          name: nombre
+          required: true
+          schema:
+            type: string
+            format: varchar(100)
+        - in: query
+          name: email
+          required: true
+          schema:
+            type: string
+            format: varchar(100)
+        - in: query
+          name: telefono
+          required: true
+          schema:
+            type: string
+            format: varchar(100)
+        - in: query
+          name: direccion
+          required: true
+          schema:
+            type: string
+            format: varchar(400)
+        - in: query
+          name: tipoUsuario
+          required: true
+          schema:
+            type: string
+            format: varchar(45)
+      responses:
+        201:
+          description: Usuario creado exitosamente
+          content:
+            application/json:
+              schema:
+                items:
+                  "$ref": "#/components/schemas/usuario"
+        400:
+          description: Este usuario ya existe
+        500:
+          description: Error, algo salió mal
+  /login:
+    post:
+      tags:
+        - Cliente
+        - Administrador
+      summary: Ingresar a la App de Delilah Restó de manera autenticada
+      description: Login de usuarios
+      parameters:
+        - in: query
+          name: Usuario
+          required: true
+          schema:
+            type: string
+            format: varchar(20)
+        - in: query
+          name: Password
+          required: true
+          schema:
+            type: string
+            format: varchar(100)
+      responses:
+        200:
+          description: Bienvenido
+        400:
+          description: Datos incorrectos
+        500:
+          description: Error, algo salió mal
+  /usuarios:
+    get:
+      security:
+        - bearerAuthAdministrador: []
+      tags:
+        - Administrador
+      summary: Obtener lista de los usuarios
+      description: Lista de todos los usuarios registrados a nuestra aplicación
+      responses:
+        200:
+          description: Successful request
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/usuario"
+        404:
+          description: No hay usuarios registrados
+          content:
+            application/json:
+              schema:
+                type: string
+                example: {"Error 404": "No hay usuarios registrados."}
+        500:
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                type: string
+                example: {"Error 500": "Error, algo salió mal"}
+  /usuarios/{id}:
+    get:
+      security:
+        - bearerAuthCliente: []
+      tags:
+        - Cliente
+      summary: Obtener un usuario específico
+      description: Información detallada de un usuario
+      parameters: 
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                items:
+                  "$ref": "#/components/schemas/usuario"
+        400:
+          description: La información no está disponible
+        401:
+          description: No tienes permisos
+        500:
+          description: Error, algo salió mal
+    put:
+      security:
+        - bearerAuthCliente: []
+      tags:
+        - Cliente
+      summary: Modificar un usuario
+      description: Modificar datos de un usuario registrado
+      parameters: 
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - in: query
+          name: nombre
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: email
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: telefono
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: direccion
+          required: false
+          schema:
+            type: string
+      responses:
+        200:
+          description: Dato modificado exitosamente
+        404:
+          description: El usuario no existe
+        500:
+          description: Error, algo salió mal
+    delete:
+      security:
+        - bearerAuthCliente: []
+      tags:
+        - Cliente
+      summary: Eliminar un usuario
+      description: Eliminar un usuario registrado
+      parameters: 
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: Usuario eliminado exitosamente
+        401:
+          description: No tienes permisos
+        500:
+          description: Error, algo salió mal
+  /productos:
+    get:
+      tags:
+        - Cliente
+        - Administrador
+      summary: Obtener todos los productos
+      description: Lista de todos los productos registrados a nuestra aplicación
+      responses:
+        200:
+          description: Successful request
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/producto"
+        404:
+          description: No hay productos registrados
+          content:
+            application/json:
+              schema:
+                type: string
+                example: {"Error 404": "Request not found."}
+        500:
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                type: string
+                example: {"Error 500": "Internal Server Error"}
+    post:
+      security:
+        - bearerAuthAdministrador: []
+      tags:
+        - Administrador
+      summary: Agregar nuevo producto
+      parameters: 
+        - in: query
+          name: nombre
+          example: 'Hamburguesa Clásica'
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: descripcion
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: precio
+          required: true
+          schema:
+            type: number
+            format: float
+        - in: query
+          name: stock
+          required: true
+          schema:
+            type: number
+      responses:
+        201:
+          description: Producto agregado con éxito
+        500:
+          description: Error interno
+    delete:
+      security:
+        - bearerAuthAdministrador: []
+      tags:
+        - Administrador
+      summary: Eliminar los productos
+      parameters: 
+        - in: query
+          name: id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: Producto eliminado
+        500:
+          description: Error interno
+  /productos/{id}:
+    get:
+      tags:
+        - Cliente
+        - Administrador
+      summary: Obtener un producto específico por su id
+      description: Descripcion de un producto específico
+      parameters: 
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                items:
+                  "$ref": "#/components/schemas/producto"
+        404:
+          description: El producto no existe
+        500:
+          description: Error interno
+    put:
+      security:
+        - bearerAuthAdministrador: []
+      tags:
+        - Administrador
+      summary: Modificar información de un producto
+      description: Modificar algo de un producto. Puede ser el nombre, la descripción, el precio o si hay en stock (1 si hay disponible y 0 si no está disponible)
+      parameters: 
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - in: query
+          name: nombre
+          required: true
+          schema:
+            type: string 
+        - in: query
+          name: descripcion
+          required: false
+          schema:
+            type: string 
+        - in: query
+          name: precio
+          required: true
+          schema:
+            type: number
+            format: float
+        - in: query
+          name: stock
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Stock modificado exitosamente
+        500:
+          description: Error interno
+    delete:
+      security:
+        - bearerAuthAdministrador: []
+      tags:
+        - Administrador
+      summary: Borrar un producto
+      description: Descripcion
+      parameters: 
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: Producto eliminado del stock exitosamente
+        500:
+          description: Error interno
+  /ordenes:
+    get:
+      security:
+        - bearerAuthAdministrador: []
+      tags:
+        - Administrador
+      summary: Se obtienen todas las órdenes
+      description: Se obtienen todas las órdenes realizadas al restaurant
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/pedido"
+        404:
+          description: No hay órdenes registradas
+        500:
+          description: Error interno
+    put:
+      security:
+        - bearerAuthAdministrador: []
+      tags:
+        - Administrador
+      summary: Modificar el estado de un pedido
+      description: Modificar el estado de un pedido empezando en Nuevo y pasando por Confirmado, Preparando, Enviando y Cancelado o Entregado.
+      parameters: 
+        - in: query
+          name: id
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - in: query
+          name: estado
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: Has modificado el estado de la orden
+        401:
+          description: No puedes realizar cambios a la orden
+        500:
+          description: Error interno
+  /ordenes/{id}:
+    get:
+      security:
+        - bearerAuthAdministrador: []
+      tags:
+        - Administrador
+      summary: Obtener una orden específica
+      description: Información detallada de una orden
+      parameters: 
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                items:
+                  "$ref": "#/components/schemas/detallepedido"
+        404:
+          description: La orden no existe
+        500:
+          description: Error interno
+  /pedidos:
+    get:
+      security:
+        - bearerAuthCliente: []
+      tags:
+        - Cliente
+      summary: Ver todos los pedidos realizados
+      description: Se obtienen todos los pedidos realizados
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                items:
+                  "$ref": "#/components/schemas/pedido"
+        404:
+          description: No hay pedidos registrados
+        500:
+          description: Error interno
+    post:
+      security:
+        - bearerAuthCliente: []
+      tags:
+        - Cliente
+      summary: Realizar pedido o compra
+      description: Realiza la compra de todos los productos que estaban en el carrito de compras
+      parameters:
+        - in: query
+          name: FormaDePago
+          description: Forma de pago del pedido. 1 Tarjeta, 2 Efectivo
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Tu compra fue realizada exitosamente
+        404:
+          description: No tienes items agregados al carrito
+        500:
+          description: Error interno
+  /pedidos/{id}:
+    get:
+      security:
+        - bearerAuthCliente: []
+      tags:
+        - Cliente
+      summary: Obtener pedido específico por su id
+      description: Información detallada de un pedido
+      parameters: 
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                items:
+                  "$ref": "#/components/schemas/detallepedido"
+        404:
+          description: La compra no está disponible
+        500:
+          description: Error interno
+  /carrito:
+    get:
+      security:
+        - bearerAuthCliente: []
+      tags:
+        - Cliente
+      summary: Obtener todos los productos dentro del carrito
+      description: Obtiene todos los productos del carrito de compras y sus cantidades
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                items:
+                  "$ref": "#/components/schemas/producto"
+        404:
+          description: El carrito está vacío
+        500:
+          description: Error interno
+    post:
+      security:
+        - bearerAuthCliente: []
+      tags:
+        - Cliente
+      summary: Agregar productos al carrito
+      description: Agrega productos al carrito de compras
+      parameters: 
+        - in: query
+          name: CantidadProduct
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - in: query
+          name: Productos_idProductos
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: Agregado con éxito
+        400:
+          description: Ya este producto fue agregado al carrito
+        500:
+          description: Error interno
+    put:
+      security:
+        - bearerAuthCliente: []
+      tags:
+        - Cliente
+      summary: Modifica cantidad de productos del carrito
+      description: Modifica la cantidad de algún producto del carrito
+      parameters: 
+        - in: query
+          name: CantidadProduct
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - in: query
+          name: Productos_idProductos
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: El cambio fue realizado exitosamente
+        500:
+          description: Error interno
+    delete:
+      security:
+        - bearerAuthCliente: []
+      tags:
+        - Cliente
+      summary: Elimina todos los productos del carrito
+      description: Vacía el carrito de compras
+      responses:
+        200:
+          description: OK
+        500:
+          description: Error interno
+  /carrito/{id}:
+    delete:
+      security:
+        - bearerAuthCliente: []
+      tags:
+        - Cliente
+      summary: Eliminar producto del carrito
+      description: Eliminar un producto del carrito
+      parameters: 
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: El producto fue eliminado exitosamente
+        404:
+          description: El producto no está disponible
+        500:
+          description: Error interno
+  /favoritos:
+    get:
+      security:
+        - bearerAuthCliente: []
+      tags:
+        - Cliente
+      summary: Obtener lista de productos favoritos
+      description: Obtener la lista personal de productos favoritos
+      responses:
+        200:
+          description: Ok
+        404:
+          description: No tienes productos favoritos agregados
+        500:
+          description: Error interno
+    post:
+      security:
+        - bearerAuthCliente: []
+      tags:
+        - Cliente
+      summary: Agrega el producto a favoritos
+      description: Agrega el producto a la lista personal de favoritos
+      parameters: 
+        - in: query
+          name: Productos_idProductos
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: Agregado a favoritos con éxito
+        404:
+          description: Este producto ya es favorito
+        500:
+          description: Error interno
+    delete:
+      security:
+        - bearerAuthCliente: []
+      tags:
+        - Cliente
+      summary: Elimina el producto de favoritos
+      description: Elimina el producto de favoritos de la lista personal de favoritos
+      parameters: 
+        - in: query
+          name: Productos_idProductos
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: Eliminado de tus favoritos con éxito
+        404:
+          description: Este producto no está como favorito
+        500:
+          description: Error interno
+          
+components:
+  securitySchemes: 
+        bearerAuthAdministrador:
+          type: http
+          scheme: bearer
+          bearerFormat: JWT 
+        bearerAuthCliente:
+          type: http
+          scheme: bearer
+          bearerFormat: JWT
+  schemas:
+    producto:
+      type: object
+      properties:
+        idProductos: 
+          type: integer
+          example: 12
+        Nombre: 
+          type: string
+          example: Foccacia
+        Descripcion: 
+          type: string
+          example: Foccacia de la casa
+        Precio: 
+          type: number
+          format: float
+          example: 25.5
+        Stock: 
+          type: integer
+          example: 1
+          description: 1 Disponible, 0 No disponible
+    usuario:
+      type: object
+      properties:
+        id: 
+          type: integer
+          example: 12
+        Usuario: 
+          type: string
+          example: PedroP545
+        Password: 
+          type: string
+          example: U.12345
+        Nombre: 
+          type: string
+          example: Pedro Pérez
+        Email: 
+          type: string
+          example: pedroperez@gmail.com
+        Telefono: 
+          type: string
+          example: +541140902777
+        Direccion: 
+          type: string
+          example: Tacuarí 677, piso 2, depto 11. Caba
+        tipoUsuario: 
+          type: string
+          example: 1
+          description: 1 significa Administrador, 0 significa Cliente
+    pedido:
+      type: object
+      properties:
+        id: 
+          type: integer
+          description: Id de la orden
+          example: 2
+        Fecha: 
+          type: string
+          example: Mon Oct 19 2020 23:02:02 GMT-0300
+        PrecioTotal: 
+          type: number
+          format: float
+          example: 2345.5
+        Estados_id: 
+          type: integer
+          description: Estado de la orden. 1 Nuevo, 2 Confirmado, 3 Preparando, 4 Enviando, 5 Cancelado, 6 Entregado
+          example: 1
+        FormaDePago: 
+          type: integer
+          description: Forma de pago del pedido. 1 Tarjeta, 2 Efectivo
+          example: 1
+        Cliente_id: 
+          type: integer
+          description: Id del cliente que realiza el pedido
+          example: 11
+    detallepedido:
+      type: object
+      properties:
+        Id: 
+          type: integer
+          description: Id del item del pedido
+          example: 2
+        CantidadProduct: 
+          type: integer
+          description: Cantidad de cada item del producto
+          example: 3
+        Precio: 
+          type: number
+          description: Precio de cada producto
+          format: float
+          example: 220.5
+        Productos_idProductos: 
+          type: integer
+          description: Id del producto
+          example: 2
+        Compra: 
+          type: string
+          description: Identificador de cada compra. Si está en 0, el producto está en el carrito pero no ha sido comprado.
+          example: "2020-10-20T02:02:02.362Z"
+        Cliente_id: 
+          type: integer
+          description: Id del cliente que realiza el pedido
+          example: 11
+
+
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            

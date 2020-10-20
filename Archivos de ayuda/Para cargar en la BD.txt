@@ -1,0 +1,155 @@
+A continuación se presentan varios items para cargar directamente en la base de datos, los cuales nos ayudarán a utilizar más rápido la app. 
+
+Los usuarios administradores y estados de los pedidos deben cargarse para el funcionamiento correcto, los usuarios clientes y platillos pueden ser opcionales o cargarse con el uso de la aplicación.
+
+Para cargar, se copia cada sección por separado sin incluir los títulos; o se pueden cargar todas juntas pero sin incluir los títulos de cada una.
+
+
+
+
+-------------------------------------------------------------------------------------------------
+USUARIOS ADMINISTRADORES
+-------------------------------------------------------------------------------------------------
+
+INSERT INTO `Cliente`(`Usuario`, `Password`, `Nombre`, `Email`, `Telefono`, `Direccion`, `tipoUsuario`) 
+VALUES ('Admin1', 'A.12345', 'Administrador 1', 'admin1@gmail.com', '12345678', 'Buenos Aires, Argentina.', '1');
+
+INSERT INTO `Cliente`(`Usuario`, `Password`, `Nombre`, `Email`, `Telefono`, `Direccion`, `tipoUsuario`) 
+VALUES ('Admin2', 'A.12345', 'Administrador 2', 'admin2@gmail.com', '23456789', 'Buenos Aires, Argentina.', '1');
+
+
+
+
+
+-------------------------------------------------------------------------------------------------
+ESTADOS DE LOS PEDIDOS
+-------------------------------------------------------------------------------------------------
+
+INSERT INTO `Estados`(`id`, `EstadoDelPedido`) 
+VALUES ('1', 'Nuevo');
+
+INSERT INTO `Estados`(`id`, `EstadoDelPedido`) 
+VALUES ('2', 'Confirmado');
+
+INSERT INTO `Estados`(`id`, `EstadoDelPedido`) 
+VALUES ('3', 'Preparando');
+
+INSERT INTO `Estados`(`id`, `EstadoDelPedido`) 
+VALUES ('4', 'Enviando');
+
+INSERT INTO `Estados`(`id`, `EstadoDelPedido`) 
+VALUES ('5', 'Cancelado');
+
+INSERT INTO `Estados`(`id`, `EstadoDelPedido`) 
+VALUES ('6', 'Entregado');
+
+
+
+
+
+-------------------------------------------------------------------------------------------------
+USUARIOS CLIENTES
+-------------------------------------------------------------------------------------------------
+
+INSERT INTO `Cliente`(`Usuario`, `Password`, `Nombre`, `Email`, `Telefono`, `Direccion`, `tipoUsuario`) 
+VALUES ('Usuario1', 'U.12345', 'Usuario 1', 'usuario1@gmail.com', '34567890', 'Buenos Aires, Argentina.', '0');
+
+INSERT INTO `Cliente`(`Usuario`, `Password`, `Nombre`, `Email`, `Telefono`, `Direccion`, `tipoUsuario`) 
+VALUES ('Usuario2', 'U.12345', 'Usuario 2', 'usuario2@gmail.com', '45678901', 'Buenos Aires, Argentina.', '0');
+
+
+
+
+
+-------------------------------------------------------------------------------------------------
+PLATILLOS DELILAH RESTO
+-------------------------------------------------------------------------------------------------
+
+INSERT INTO `Productos`(`Nombre`, `Descripcion`, `Precio`, `Stock`) 
+VALUES ('Hamburguesa Clásica','Hamburguesa con carne de 200gr, lechuga, tomate, queso y salsas tradicionales','350','1');
+
+INSERT INTO `Productos`(`Nombre`, `Descripcion`, `Precio`, `Stock`) 
+VALUES ('Bagel de salmón','Bagel hecho al momento con delicioso churrasco de salmón y salsa especial, fetas de tomate y rúcula','425','1');
+
+INSERT INTO `Productos`(`Nombre`, `Descripcion`, `Precio`, `Stock`) 
+VALUES ('Sandwich veggie','Sandwich hecho con pan de salvado de trigo con sésamo, lechuga, tomate, pepinillos, palta y salsa especial','310','1');
+
+INSERT INTO `Productos`(`Nombre`, `Descripcion`, `Precio`, `Stock`) 
+VALUES ('Ensalada veggie','Ensalada creada en una cama de lechuga romana, tomate, pepino, palta, cebolla morada y aderezo Delilah','340','1');
+
+INSERT INTO `Productos`(`Nombre`, `Descripcion`, `Precio`, `Stock`) 
+VALUES ('Focaccia','Focaccia fresca de la casa','300','1');
+
+INSERT INTO `Productos`(`Nombre`, `Descripcion`, `Precio`, `Stock`) 
+VALUES ('Tequeños','6 Dedos de queso mozzarella cubiertos de una fina masa hojaldrada fritos, acompañados con jarabe de chancaca y finas hierbas','200','1');
+
+INSERT INTO `Productos`(`Nombre`, `Descripcion`, `Precio`, `Stock`) 
+VALUES ('Arepa pelúa','Arepa rellena de carne mechada con queso amarillo en hebras','200','1');
+
+
+
+
+
+
+
+
+-------------------------------------------------------------------------------------------------
+------------------------   TODOS LOS DATOS JUNTOS PARA CARGAR  ----------------------------------
+-------------------------------------------------------------------------------------------------
+
+INSERT INTO `Cliente`(`Usuario`, `Password`, `Nombre`, `Email`, `Telefono`, `Direccion`, `tipoUsuario`) 
+VALUES ('Admin1', 'A.12345', 'Administrador 1', 'admin1@gmail.com', '12345678', 'Buenos Aires, Argentina.', '1');
+
+INSERT INTO `Cliente`(`Usuario`, `Password`, `Nombre`, `Email`, `Telefono`, `Direccion`, `tipoUsuario`) 
+VALUES ('Admin2', 'A.12345', 'Administrador 2', 'admin2@gmail.com', '23456789', 'Buenos Aires, Argentina.', '1');
+
+
+INSERT INTO `Estados`(`id`, `EstadoDelPedido`) 
+VALUES ('1', 'Nuevo');
+
+INSERT INTO `Estados`(`id`, `EstadoDelPedido`) 
+VALUES ('2', 'Confirmado');
+
+INSERT INTO `Estados`(`id`, `EstadoDelPedido`) 
+VALUES ('3', 'Preparando');
+
+INSERT INTO `Estados`(`id`, `EstadoDelPedido`) 
+VALUES ('4', 'Enviando');
+
+INSERT INTO `Estados`(`id`, `EstadoDelPedido`) 
+VALUES ('5', 'Entregado');
+
+INSERT INTO `Estados`(`id`, `EstadoDelPedido`) 
+VALUES ('6', 'Cancelado');
+
+
+
+
+
+INSERT INTO `Cliente`(`Usuario`, `Password`, `Nombre`, `Email`, `Telefono`, `Direccion`, `tipoUsuario`) 
+VALUES ('Usuario1', 'U.12345', 'Usuario 1', 'usuario1@gmail.com', '34567890', 'Buenos Aires, Argentina.', '0');
+
+INSERT INTO `Cliente`(`Usuario`, `Password`, `Nombre`, `Email`, `Telefono`, `Direccion`, `tipoUsuario`) 
+VALUES ('Usuario2', 'U.12345', 'Usuario 2', 'usuario2@gmail.com', '45678901', 'Buenos Aires, Argentina.', '0');
+
+
+INSERT INTO `Productos`(`Nombre`, `Descripcion`, `Precio`, `Stock`) 
+VALUES ('Hamburguesa Clásica','Hamburguesa con carne de 200gr, lechuga, tomate, queso y salsas tradicionales','350','1');
+
+INSERT INTO `Productos`(`Nombre`, `Descripcion`, `Precio`, `Stock`) 
+VALUES ('Bagel de salmón','Bagel hecho al momento con delicioso churrasco de salmón y salsa especial, fetas de tomate y rúcula','425','1');
+
+INSERT INTO `Productos`(`Nombre`, `Descripcion`, `Precio`, `Stock`) 
+VALUES ('Sandwich veggie','Sandwich hecho con pan de salvado de trigo con sésamo, lechuga, tomate, pepinillos, palta y salsa especial','310','1');
+
+INSERT INTO `Productos`(`Nombre`, `Descripcion`, `Precio`, `Stock`) 
+VALUES ('Ensalada veggie','Ensalada creada en una cama de lechuga romana, tomate, pepino, palta, cebolla morada y aderezo Delilah','340','1');
+
+INSERT INTO `Productos`(`Nombre`, `Descripcion`, `Precio`, `Stock`) 
+VALUES ('Focaccia','Focaccia fresca de la casa','300','1');
+
+INSERT INTO `Productos`(`Nombre`, `Descripcion`, `Precio`, `Stock`) 
+VALUES ('Tequeños','6 Dedos de queso mozzarella cubiertos de una fina masa hojaldrada fritos, acompañados con jarabe de chancaca y finas hierbas','200','1');
+
+
+
