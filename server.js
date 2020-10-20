@@ -705,7 +705,7 @@ server.delete('/carrito/:id', validarUsuarioCliente, (req, res) => {
         }
     });
 });
-
+ 
 
 // ----------------------------- FAVORITOS ----------------------------------- 
 // VER LOS FAVORITOS - CLIENTE
