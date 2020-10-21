@@ -1,6 +1,6 @@
 A continuación se presentan varios items para cargar directamente en la base de datos, los cuales nos ayudarán a utilizar más rápido la app. 
 
-Los usuarios administradores y estados de los pedidos deben cargarse para el funcionamiento correcto, los usuarios clientes y platillos pueden ser opcionales o cargarse con el uso de la aplicación.
+Los estados de los pedidos deben cargarse para el funcionamiento correcto. Los usuarios Administradores, Clientes y Platillos pueden ser opcionales o cargarse con el uso de la aplicación.
 
 Para cargar, se copia cada sección por separado sin incluir los títulos; o se pueden cargar todas juntas pero sin incluir los títulos de cada una.
 

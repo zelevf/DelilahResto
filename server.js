@@ -86,6 +86,28 @@ server.post('/registro/', (req, res) => {
 
 
 
+// ----------------------------- REGISTRO DE USUARIOS ADMINISTRADORES -----------------------------------
+
+server.post('/registroadministradordr/', (req, res) => {
+    const { usuario, password, nombre, email, telefono, direccion } = req.body;
+
+    sequelize.query('select * From cliente where usuario = :usuario',
+        { replacements: { usuario: usuario }, type: sequelize.QueryTypes.SELECT }
+    ).then(function (result) {
+        if (result < 1) {
+            sequelize.query("INSERT INTO cliente (usuario, password, nombre, email, telefono, direccion, tipoUsuario) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                { replacements: [usuario, password, nombre, email, telefono, direccion, 1] }
+            ).then(() => {
+                res.status(201)
+                res.json({ resultados: "Usuario Administrador creado exitosamente" });
+            });
+        } else {
+            res.status(400)
+            res.json({ error: "Este usuario ya existe" })
+        }
+    });
+});
+
 // ----------------------------- LOGIN DE USUARIOS -----------------------------------
 
 let tipoUsuario;
@@ -428,6 +450,28 @@ server.put('/ordenes/', validarUsuarioAdmin, (req, res) => {
     });
 });
 
+// ELIMINAR UNA ORDEN
+server.delete('/ordenes/', validarUsuarioAdmin, (req, res) => {
+    let idRecibido = req.body.id;
+
+    sequelize.query('select id From pedidos where id = :id and Estados_id > 4',
+        { replacements: { id: idRecibido }, type: sequelize.QueryTypes.SELECT }
+    ).then(function (result) {
+        let resu = result[0];
+        if (typeof resu === 'undefined') {
+            res.status(404)
+            res.json({ Error: "Esta orden no existe o no se puede eliminar por no haber sido cancelada o entregada" });
+        } else {
+            sequelize.query('DELETE from pedidos where id = :id',
+                { replacements: { id: `${idRecibido}` } }
+            ).then(function (resultados) {
+                res.status(200)
+                res.json("La orden ha sido eliminada")
+            });
+        }
+    })
+});
+
 
 // ÓRDENES POR SU ID - ADMINISTRADOR
 server.get('/ordenes/:id', validarUsuarioAdmin, (req, res) => {
@@ -448,7 +492,27 @@ server.get('/ordenes/:id', validarUsuarioAdmin, (req, res) => {
 
 });
 
+// ELIMINAR UNA ORDEN
+server.delete('/ordenes/:id', validarUsuarioAdmin, (req, res) => {
+    let idRecibido = req.params.id;
 
+    sequelize.query('select id From pedidos where id = :id and Estados_id > 4',
+        { replacements: { id: idRecibido }, type: sequelize.QueryTypes.SELECT }
+    ).then(function (result) {
+        let resu = result[0];
+        if (typeof resu === 'undefined') {
+            res.status(404)
+            res.json({ Error: "Esta orden no existe o no se puede eliminar por no haber sido cancelada o entregada" });
+        } else {
+            sequelize.query('DELETE from pedidos where id = :id',
+                { replacements: { id: `${idRecibido}` } }
+            ).then(function (resultados) {
+                res.status(200)
+                res.json("La orden ha sido eliminada")
+            });
+        }
+    })
+});
 
 // ----------------------------- PEDIDOS - CLIENTE -----------------------------------
 

@@ -14,9 +14,69 @@ paths:
     post:
       tags:
         - Cliente
-        - Administrador
       summary: Registrarse a la App de Delilah Restó
       description: Registro de usuarios
+      parameters: 
+        - in: query
+          name: usuario
+          required: true
+          schema:
+            type: string
+            format: varchar(20)
+        - in: query
+          name: password
+          required: true
+          schema:
+            type: string
+            format: varchar(100)
+        - in: query
+          name: nombre
+          required: true
+          schema:
+            type: string
+            format: varchar(100)
+        - in: query
+          name: email
+          required: true
+          schema:
+            type: string
+            format: varchar(100)
+        - in: query
+          name: telefono
+          required: true
+          schema:
+            type: string
+            format: varchar(100)
+        - in: query
+          name: direccion
+          required: true
+          schema:
+            type: string
+            format: varchar(400)
+        - in: query
+          name: tipoUsuario
+          required: true
+          schema:
+            type: string
+            format: varchar(45)
+      responses:
+        201:
+          description: Usuario creado exitosamente
+          content:
+            application/json:
+              schema:
+                items:
+                  "$ref": "#/components/schemas/usuario"
+        400:
+          description: Este usuario ya existe
+        500:
+          description: Error, algo salió mal
+  /registroadministradordr:
+    post:
+      tags:
+        - Administrador
+      summary: Registrarse a la App de Delilah Restó como Administrador
+      description: Registro de usuarios administradores
       parameters: 
         - in: query
           name: usuario
@@ -436,6 +496,27 @@ paths:
           description: No puedes realizar cambios a la orden
         500:
           description: Error interno
+    delete:
+      security:
+        - bearerAuthAdministrador: []
+      tags:
+        - Administrador
+      summary: Elimina un pedido
+      description: Esta opción elimina un pedido de nuestra base de datos.
+      parameters: 
+        - in: query
+          name: id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: Has modificado el estado de la orden
+        401:
+          description: No puedes realizar cambios a la orden
+        500:
+          description: Error interno
   /ordenes/{id}:
     get:
       security:
@@ -461,6 +542,27 @@ paths:
                   "$ref": "#/components/schemas/detallepedido"
         404:
           description: La orden no existe
+        500:
+          description: Error interno
+    delete:
+      security:
+        - bearerAuthAdministrador: []
+      tags:
+        - Administrador
+      summary: Elimina un pedido
+      description: Esta opción elimina un pedido de nuestra base de datos por su id.
+      parameters: 
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: Has modificado el estado de la orden
+        401:
+          description: No puedes realizar cambios a la orden
         500:
           description: Error interno
   /pedidos:

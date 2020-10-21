@@ -11,9 +11,11 @@ Aquí encontrarás un archivo JS donde está todo el proyecto, el archivo packag
 
 En la carpeta Archivos de ayuda, encontrarás: 
 - El archivo YAML con toda la información de la API.
-- El archivo SQL con la estrutura de base de datos.
+- El archivo SQL con la estructura de base de datos.
 - Un archivo txt con la estructura de la base de datos.
-- Un archivo llamado Para cargar en la BD, con información para cargar Usuarios (Administradores o Clientes), Estados de los Pedidos y 6 distintos platillos de prueba para el restó.
+- Un archivo llamado Para cargar en la BD, con información para cargar Usuarios (Administradores o Clientes), Estados de los Pedidos y 6 distintos platillos de prueba para el restó. 
+
+La información de Estados de los pedidos es obligatoria para el correcto uso de la aplicación, lo demás puede ser opcional.
 
 
 
@@ -37,11 +39,11 @@ Ya contamos con nuestra estructura de la base de datos, ahora debemos cargar alg
 
 IMPORTANTE: Hay datos necesarios para su correcto uso y otros opcionales que nos permitirán adelantar un poco las cosas.
 
-Neecesarios:
-- Usuarios Administradores.
+Necesarios:
 - Estados de los pedidos.
 
 Opcionales:
+- Usuarios Administradores.
 - Usuarios Clientes.
 - Platillos Delilah Restó.
 
@@ -56,8 +58,7 @@ Ya es momento de utilizar nuestra aplicación, es importante recordar que los ar
 - Desde la terminal de nuestro editor de código deberás ejecutar el comando nodemon server.
 
 
-Ya está todo listo, ahora puedes realizar todas las consultas quieras a la API Delilah Resto hecha por mi,
-espero que te sea de gran ayuda.
+Ya está todo listo, ahora puedes realizar todas las consultas que quieras a la API Delilah Resto hecha por mi, espero que te sea de gran ayuda.
 
 
 
@@ -66,7 +67,11 @@ Recuerda que puedes apoyarte en el archivo YAML para saber qué datos debes agre
 
 Ruta: /registro
 Método: Post
-Esta ruta carga un dato oculto que es el "tipoUsuario", el cual está predeterminado a cliente identificado como "0". Se puede agregar otros usuarios administradores con la estructura SQL que se encuentra en el archivo "Para cargar en la BD.txt", estos deben tener el "tipoUsuario" identificado como "1".
+Esta ruta carga un dato oculto que es el "tipoUsuario", el cual está predeterminado a Cliente identificado como "0". 
+
+Ruta: /registroadministradordr
+Método: Post
+Esta ruta carga un dato oculto que es el "tipoUsuario", el cual está predeterminado a Administrador identificado como "1".
 
 Ruta: /login
 Método: Post
@@ -100,12 +105,28 @@ Esta ruta requiere un dato que es el "stock", cuando el producto está disponibl
 
 Ruta: /ordenes
 Método: Get 
-Esta ruta ofrece el dato "Estados_id", que indica el estado del pedido. 1 es Nuevo, 2 es Confirmado, 3 Preparando, 4 Enviando, 5 Cancelado y 6 Entregado.
+Esta ruta ofrece el dato "Estados_id", que indica el estado del pedido: 
+1 Nuevo
+2 Confirmado 
+3 Preparando
+4 Enviando
+5 Cancelado
+6 Entregado.
 
 Ruta: /ordenes/
 Método: Put 
-Esta ruta requiere el dato "Estados_id", que indica el estado del pedido. 1 es Nuevo, 2 es Confirmado, 3 Preparando, 4 Enviando, 5 Cancelado y 6 Entregado.
+Esta ruta requiere el dato "Estados_id", que indica el estado del pedido: 
+1 Nuevo
+2 Confirmado 
+3 Preparando
+4 Enviando
+5 Cancelado
+6 Entregado.
 
+Ruta: /ordenes/
+Método: Delete 
+Esta ruta requiere el dato "id" de Pedidos. Esta opción elimina el pedido de nuestra base de datos, siempre y cuando el pedido haya sido cancelado (5 Cancelado) o entregado (6 Entregado). No se podrá eliminar un pedido mientras esté en proceso (1 Nuevo, 2 Confirmado, 3 Preparando o 4 Enviando).
 
-
-
+Ruta: /ordenes/{id}
+Método: Delete 
+Esta ruta requiere el dato "id" de Pedidos. Esta opción elimina el pedido de nuestra base de datos, siempre y cuando el pedido haya sido cancelado (5 Cancelado) o entregado (6 Entregado). No se podrá eliminar un pedido mientras esté en proceso (1 Nuevo, 2 Confirmado, 3 Preparando o 4 Enviando).
