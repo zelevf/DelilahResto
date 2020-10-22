@@ -4,9 +4,6 @@ Debes tener instalado Node.js, MySQL y Postman.
 
 Descarga de archivos:
 
-Para empezar, primero deberás clonar el repositorio desde Github, aquí tienes el link:
-https://github.com/zelevf/DelilahResto
-
 Aquí encontrarás un archivo JS donde está todo el proyecto, el archivo package.json, el archivo package-lock.json y una carpeta llamada Archivos de ayuda.
 
 En la carpeta Archivos de ayuda, encontrarás: 
