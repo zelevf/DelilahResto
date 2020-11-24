@@ -1,3 +1,15 @@
+Delilah Restó
+
+Proyecto realizado como parte de la carrera de Desarrollo Web Full Stack de Acámica.
+
+El proyecto está basado en la creación de un sistema de pedidos para Delilah Restó. Estableciendo una REST API completamente funcional, que permite realizar operaciones CRUD sobre una estructura de datos; consumible por administradores y clientes (según sea el caso). una aplicación web interactiva, en la que se puedan crear y compartir GIF. En esta oportunidad el uso de JavaScript es fundamental en la obtención de datos de la API de Giphy. También se trabajó con la API de Record.RTC obteniendo imágenes a través de la webcam.
+
+Fue utilizado HTML, CSS y JavaScript para su producción.
+
+
+------------------------------------------------------------
+GUÍA PARA UTILIZAR ESTE REPOSITORIO.
+
 Hola, esta es una guía para utilizar los archivos del proyecto Delilah Restó.
 Debes tener instalado Node.js, MySQL y Postman.
 
